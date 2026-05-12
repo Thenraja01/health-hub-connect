@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Phone, Mail, Award, BookOpen, IndianRupee, FileText, Save, Loader2, CheckCircle } from 'lucide-react';
+import { User, Phone, Mail, Award, BookOpen, IndianRupee, FileText, Save, Loader2, CheckCircle, MapPin, Stethoscope, Languages, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,12 +12,35 @@ import { updateProfile } from '../../store/slices/authSlice';
 export default function DoctorProfile() {
   const { user } = useSelector((state: RootState) => state.auth);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [profileData, setProfileData] = useState<any>(null);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append('certification', file);
+
+      const res = await api.post('/doctors/upload-certification', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      toast.success("Certification uploaded successfully");
+      setProfileData(res.data.data);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -133,6 +156,45 @@ export default function DoctorProfile() {
                 className="rounded-xl h-12 glass border-border/40 text-primary font-bold"
               />
             </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <Stethoscope className="h-3.5 w-3.5" /> Hospital
+              </label>
+              <Input 
+                value={profileData?.hospitalName || ''} 
+                onChange={(e) => setProfileData({...profileData, hospitalName: e.target.value})}
+                placeholder="e.g. City General Hospital"
+                className="rounded-xl h-12 glass border-border/40"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <MapPin className="h-3.5 w-3.5" /> Location
+              </label>
+              <Input 
+                value={profileData?.location || ''} 
+                onChange={(e) => setProfileData({...profileData, location: e.target.value})}
+                placeholder="e.g. New York, USA"
+                className="rounded-xl h-12 glass border-border/40"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <Languages className="h-3.5 w-3.5" /> Languages (Comma separated)
+              </label>
+              <Input 
+                value={profileData?.languages?.map((l: any) => l.language).join(', ') || ''} 
+                onChange={(e) => {
+                  const langs = e.target.value.split(',').map(s => ({ language: s.trim() }));
+                  setProfileData({...profileData, languages: langs});
+                }}
+                placeholder="e.g. English, Spanish"
+                className="rounded-xl h-12 glass border-border/40"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -145,6 +207,45 @@ export default function DoctorProfile() {
               placeholder="Tell patients about your expertise and approach to care..."
               className="rounded-2xl min-h-[150px] glass border-border/40 resize-none p-4"
             />
+          </div>
+
+          <div className="space-y-4">
+            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Award className="h-3.5 w-3.5" /> Certifications & Documents
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               {profileData?.kycDocuments?.map((doc: any, i: number) => (
+                 <div key={i} className="flex items-center justify-between p-3 glass rounded-xl border border-border/40">
+                    <div className="flex items-center gap-3">
+                       <FileText className="h-5 w-5 text-primary" />
+                       <div>
+                          <p className="text-xs font-bold truncate max-w-[150px]">{doc.name}</p>
+                          <p className="text-[10px] text-muted-foreground">{new Date(doc.uploadedAt).toLocaleDateString()}</p>
+                       </div>
+                    </div>
+                    <Button variant="ghost" size="sm" className="h-8 text-[10px]" asChild>
+                       <a href={doc.url} target="_blank" rel="noreferrer">View</a>
+                    </Button>
+                 </div>
+               ))}
+               
+               <div className="relative group">
+                 <input 
+                    type="file" 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    onChange={handleFileChange}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                 />
+                 <div className="h-14 border-2 border-dashed border-border/60 rounded-2xl flex items-center justify-center gap-2 text-muted-foreground group-hover:border-primary/40 group-hover:bg-primary/5 transition-all">
+                    {uploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                    <span className="text-xs font-bold uppercase tracking-tight">Upload Certification</span>
+                 </div>
+               </div>
+            </div>
           </div>
 
           <div className="pt-4 flex items-center justify-between border-t border-border/20">

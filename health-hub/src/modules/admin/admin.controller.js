@@ -59,6 +59,16 @@ const getLogs = async (req, res) => {
   }
 };
 
+const getUsers = async (req, res) => {
+  try {
+    const doctors = await prisma.doctor.findMany();
+    const patients = await prisma.patient.findMany();
+    successResponse(res, { doctors, patients }, 'Users fetched successfully');
+  } catch (error) {
+    errorResponse(res, error.message, 500, error);
+  }
+};
+
 module.exports = {
   getDashboard,
   getPendingDoctors,
@@ -66,5 +76,6 @@ module.exports = {
   rejectDoctor,
   getRevenue,
   getLogs,
+  getUsers,
 };
 

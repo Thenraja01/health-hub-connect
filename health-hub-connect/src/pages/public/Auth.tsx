@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { 
   Stethoscope, ShieldCheck, User, 
   Mail, Lock, ArrowRight, Activity, 
@@ -19,7 +19,9 @@ import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
 
 export default function Auth() {
-  const [role, setRole] = useState<"patient" | "doctor" | "admin">("patient");
+  const [searchParams] = useSearchParams();
+  const initialRole = (searchParams.get("role")?.toLowerCase() as any) || "patient";
+  const [role, setRole] = useState<"patient" | "doctor" | "admin">(initialRole);
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(0);
   const navigate = useNavigate();
@@ -97,7 +99,9 @@ export default function Auth() {
              <Activity className="h-6 w-6 text-primary shadow-glow" />
           </div>
           <h1 className="text-3xl font-bold font-display tracking-tight">
-            {otpRequired ? "Verify OTP" : authMode === "login" ? "Welcome Back" : authMode === "signup" ? "Join Health Hub" : "Forgot Password"}
+            {otpRequired ? "Verify OTP" : 
+             authMode === "login" ? (role === 'admin' ? "Admin Login" : "Welcome Back") : 
+             authMode === "signup" ? "Join Health Hub" : "Forgot Password"}
           </h1>
           <p className="text-muted-foreground text-sm mt-2 font-medium">
             {otpRequired ? `Sent to ${tempEmail}` : "Secure Healthcare Platform"}

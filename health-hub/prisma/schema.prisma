@@ -182,7 +182,11 @@ model Doctor {
   kycStatus             ApprovalStatus       @default(PENDING)
   kycDocuments          Json?                // URLs or metadata of uploaded documents
   isApproved            Boolean              @default(false)
-  commissionRate        Float                @default(10) // Percentage
+  commissionRate        Float                @default(20) // Percentage (Admin Cut)
+
+  // Stripe Connect
+  stripeAccountId           String?
+  stripeOnboardingComplete  Boolean          @default(false)
 
   averageRating         Float?               @default(0)
   totalReviews          Int?                 @default(0)
@@ -193,6 +197,8 @@ model Doctor {
 
   status                UserStatus           @default(ACTIVE)
   isOnline              Boolean              @default(false)
+  location              String?              // Physical location/City
+  hospitalName          String?              // Manual hospital name
 
   specializationId      String?               @db.ObjectId
   hospitalId            String?               @db.ObjectId
@@ -214,6 +220,7 @@ model Doctor {
   prescriptions         Prescription[]
   reviews               PatientReview[]
   withdrawals           Withdrawal[]
+  wallet                DoctorWallet?
 
   @@index([hospitalId])
   @@index([specializationId])
@@ -225,10 +232,33 @@ model Withdrawal {
   amount            Float
   status            PaymentStatus     @default(PENDING)
   bankDetails       Json?
+  stripeTransferId  String?           // If withdrawal is processed via Stripe
   processedAt       DateTime?
   createdAt         DateTime          @default(now())
 
   doctor            Doctor            @relation(fields: [doctorId], references: [id])
+}
+
+model DoctorWallet {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  doctorId          String            @unique @db.ObjectId
+  pendingBalance    Float             @default(0)
+  availableBalance  Float             @default(0)
+  totalEarned       Float             @default(0)
+  currency          String            @default("USD")
+
+  updatedAt         DateTime          @updatedAt
+
+  doctor            Doctor            @relation(fields: [doctorId], references: [id])
+}
+
+model AdminRevenue {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  totalRevenue      Float             @default(0)
+  totalCommission   Float             @default(0)
+  pendingWithdrawals Float            @default(0)
+  currency          String            @default("USD")
+  updatedAt         DateTime          @updatedAt
 }
 
 
@@ -309,7 +339,7 @@ model Patient {
   alternatePhone          String?
 
   password                String
-  refreshToken            String?             // For JWT refresh flow
+  refreshToken            String?
 
   gender                  String?
 
@@ -518,6 +548,11 @@ model Payment {
   commissionAmount      Float?
 
   paymentStatus         PaymentStatus     @default(PENDING)
+
+  stripePaymentIntentId String?           @unique
+  stripeSessionId       String?           @unique
+  transferId            String?           // Transfer to doctor
+  applicationFeeId      String?           // Platform fee
 
   paidAt                DateTime?
 

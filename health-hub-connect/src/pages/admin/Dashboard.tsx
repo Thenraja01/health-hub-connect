@@ -13,7 +13,9 @@ export default function AdminDashboard() {
     patients: 0,
     doctors: 0,
     appointments: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
+    totalCommission: 0,
+    pendingWithdrawals: 0
   });
   const [pendingDoctors, setPendingDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,12 +61,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
         {[
           { label: "Total Patients", value: stats.patients, icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
           { label: "Active Doctors", value: stats.doctors, icon: UserCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
           { label: "Total Appointments", value: stats.appointments, icon: Calendar, color: "text-amber-500", bg: "bg-amber-500/10" },
-          { label: "Total Revenue", value: `₹${stats.totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Total Revenue", value: `$${stats.totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Total Commission", value: `$${stats.totalCommission.toLocaleString()}`, icon: TrendingUp, color: "text-purple-500", bg: "bg-purple-500/10" },
+          { label: "Pending Withdrawals", value: `$${stats.pendingWithdrawals.toLocaleString()}`, icon: Clock, color: "text-orange-500", bg: "bg-orange-500/10" },
         ].map((stat, i) => (
           <div key={i} className="glass p-6 rounded-3xl border border-border/40 shadow-soft hover:shadow-elegant transition-all">
             <div className={`${stat.bg} ${stat.color} h-10 w-10 rounded-xl flex items-center justify-center mb-4`}>

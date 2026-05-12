@@ -2,11 +2,12 @@ const adminRepository = require('./admin.repository');
 const prisma = require('../../config/database');
 
 const getDashboardData = async () => {
-  const [patientCount, doctorCount, appointmentCount, revenue, logs] = await Promise.all([
+  const [patientCount, doctorCount, appointmentCount, revenue, adminRevenue, logs] = await Promise.all([
     prisma.patient.count(),
     prisma.doctor.count(),
     prisma.appointment.count({ where: { bookingStatus: 'CONFIRMED' } }),
     prisma.payment.aggregate({ _sum: { amount: true }, where: { paymentStatus: 'PAID' } }),
+    prisma.adminRevenue.findUnique({ where: { id: 'admin_revenue_global' } }),
     prisma.auditLog.findMany({ take: 10, orderBy: { createdAt: 'desc' } })
   ]);
 
@@ -16,6 +17,8 @@ const getDashboardData = async () => {
       doctors: doctorCount,
       appointments: appointmentCount,
       totalRevenue: revenue._sum.amount || 0,
+      totalCommission: adminRevenue?.totalCommission || 0,
+      pendingWithdrawals: adminRevenue?.pendingWithdrawals || 0
     },
     logs
   };

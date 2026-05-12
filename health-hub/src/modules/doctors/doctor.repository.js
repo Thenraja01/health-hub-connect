@@ -17,6 +17,34 @@ class DoctorRepository extends BaseRepository {
     });
   }
 
+  async update(id, data) {
+    const { languages, ...otherData } = data;
+
+    // Handle languages separately if provided
+    if (languages) {
+      await prisma.doctorLanguage.deleteMany({
+        where: { doctorId: id }
+      });
+      
+      await prisma.doctorLanguage.createMany({
+        data: languages.map((l) => ({
+          doctorId: id,
+          language: l.language
+        }))
+      });
+    }
+
+    return await this.model.update({
+      where: { id },
+      data: otherData,
+      include: {
+        languages: true,
+        specialization: true,
+        hospital: true
+      }
+    });
+  }
+
   async searchDoctors(filters = {}) {
     const { specializationId, city, consultationType } = filters;
     return await this.model.findMany({

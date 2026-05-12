@@ -1,4 +1,5 @@
 const doctorService = require('./doctor.service');
+const walletService = require('../doctor/wallet.service');
 const { successResponse, errorResponse } = require('../../utils/response');
 
 const getDoctors = async (req, res) => {
@@ -110,6 +111,23 @@ const getPublicSlots = async (req, res) => {
   }
 };
 
+const uploadCertification = async (req, res) => {
+  try {
+    if (!req.file) return errorResponse(res, 'No file uploaded', 400);
+    
+    const fileUrl = `/storage/uploads/${req.file.filename}`;
+    const doctor = await doctorService.addCertification(req.user.id, {
+      name: req.file.originalname,
+      url: fileUrl,
+      type: req.file.mimetype
+    });
+    
+    successResponse(res, doctor, 'Certification uploaded successfully');
+  } catch (error) {
+    errorResponse(res, error.message, 500, error);
+  }
+};
+
 const getTasks = async (req, res) => {
   try {
     const tasks = await doctorService.getDoctorTasks(req.user.id);
@@ -128,6 +146,38 @@ const createTask = async (req, res) => {
   }
 };
 
+const getWallet = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    const wallet = await walletService.getDoctorWallet(doctorId);
+    successResponse(res, wallet, 'Wallet details retrieved');
+  } catch (error) {
+    errorResponse(res, error.message, 500, error);
+  }
+};
+
+const withdrawBalance = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    const { amount } = req.body;
+    const transfer = await walletService.requestWithdrawal(doctorId, amount);
+    successResponse(res, transfer, 'Withdrawal processed successfully');
+  } catch (error) {
+    errorResponse(res, error.message, 500, error);
+  }
+};
+
+const updateSlotStatus = async (req, res) => {
+  try {
+    const { slotId } = req.params;
+    const { status } = req.body;
+    const slot = await doctorService.updateSlotStatus(req.user.id, slotId, status);
+    successResponse(res, slot, `Slot status updated to ${status}`);
+  } catch (error) {
+    errorResponse(res, error.message, 400, error);
+  }
+};
+
 module.exports = {
   getDoctors,
   getDoctor,
@@ -143,4 +193,8 @@ module.exports = {
   createSchedule,
   getTasks,
   createTask,
+  getWallet,
+  withdrawBalance,
+  updateSlotStatus,
+  uploadCertification
 };

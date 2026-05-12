@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -11,6 +12,11 @@ const app = express();
 // Middleware
 app.use(helmet());
 app.use(cors());
+
+// Webhook route needs raw body for Stripe signature verification
+const stripeController = require('./modules/payments/stripe.controller');
+app.post('/api/payments/webhook', express.raw({type: 'application/json'}), stripeController.handleWebhook);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
@@ -68,7 +74,6 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
-
 
 // Error Handling
 app.use(errorHandler);

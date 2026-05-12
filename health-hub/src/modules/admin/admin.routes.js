@@ -13,6 +13,7 @@ router.post('/doctors/:id/approve', adminController.approveDoctor);
 router.post('/doctors/:id/reject', adminController.rejectDoctor);
 router.get('/revenue', adminController.getRevenue);
 router.get('/logs', adminController.getLogs);
+router.get('/users', adminController.getUsers);
 
 module.exports = router;
 

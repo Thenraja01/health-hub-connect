@@ -6,7 +6,8 @@ const ProtectedRoute = ({ allowedRoles }: { allowedRoles?: string[] }) => {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    const isForAdmin = allowedRoles?.includes('ADMIN');
+    return <Navigate to={`/login${isForAdmin ? '?role=admin' : ''}`} replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {

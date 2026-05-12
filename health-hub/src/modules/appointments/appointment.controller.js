@@ -12,8 +12,8 @@ const book = async (req, res) => {
 
 const confirm = async (req, res) => {
   try {
-    const { appointmentId, razorpayDetails } = req.body;
-    const appointment = await appointmentService.confirmAppointment(appointmentId, razorpayDetails);
+    const { appointmentId, sessionId } = req.body;
+    const appointment = await appointmentService.confirmAppointment(appointmentId, { sessionId });
     successResponse(res, appointment, 'Appointment confirmed successfully');
   } catch (error) {
     errorResponse(res, error.message, 400, error);
@@ -38,9 +38,20 @@ const getDoctorAppointments = async (req, res) => {
   }
 };
 
+const cancel = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+    const result = await appointmentService.cancelAppointment(appointmentId);
+    successResponse(res, result, 'Appointment cancelled successfully');
+  } catch (error) {
+    errorResponse(res, error.message, 400, error);
+  }
+};
+
 module.exports = {
   book,
   confirm,
+  cancel,
   getMyAppointments,
   getDoctorAppointments,
 };

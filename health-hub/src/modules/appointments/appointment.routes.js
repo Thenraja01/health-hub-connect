@@ -18,6 +18,12 @@ router.post(
   appointmentController.confirm
 );
 
+router.post(
+  '/cancel',
+  authorize('PATIENT'),
+  appointmentController.cancel
+);
+
 router.get(
   '/my-appointments',
   authorize('PATIENT'),

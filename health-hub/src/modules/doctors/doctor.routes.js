@@ -73,11 +73,42 @@ router.put(
   doctorController.toggleStatus
 );
 
+router.get(
+  '/wallet',
+  auth,
+  authorize('DOCTOR'),
+  doctorController.getWallet
+);
+
+router.post(
+  '/withdraw',
+  auth,
+  authorize('DOCTOR'),
+  doctorController.withdrawBalance
+);
+
+const upload = require('../../middlewares/upload.middleware');
+
+router.post(
+  '/upload-certification',
+  auth,
+  authorize('DOCTOR'),
+  upload.single('certification'),
+  doctorController.uploadCertification
+);
+
 router.put(
   '/profile',
   auth,
   authorize('DOCTOR'),
   doctorController.updateProfile
+);
+
+router.patch(
+  '/slots/:slotId',
+  auth,
+  authorize('DOCTOR'),
+  doctorController.updateSlotStatus
 );
 
 module.exports = router;

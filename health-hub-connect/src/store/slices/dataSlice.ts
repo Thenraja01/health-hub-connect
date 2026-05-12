@@ -14,6 +14,7 @@ interface DataState {
   profile: any | null;
   stats: any | null;
   earnings: any | null;
+  wallet: any | null;
   loading: boolean;
   error: string | null;
 }
@@ -30,6 +31,7 @@ const initialState: DataState = {
   profile: null,
   stats: null,
   earnings: null,
+  wallet: null,
   loading: false,
   error: null,
 };
@@ -150,6 +152,24 @@ export const fetchEarnings = createAsyncThunk('data/fetchEarnings', async (_, { 
     return response.data.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Failed to fetch earnings');
+  }
+});
+
+export const fetchWallet = createAsyncThunk('data/fetchWallet', async (_, { rejectWithValue }) => {
+  try {
+    const response = await api.get('/doctors/wallet');
+    return response.data.data;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data?.message || 'Failed to fetch wallet');
+  }
+});
+
+export const onboardStripe = createAsyncThunk('data/onboardStripe', async (_, { rejectWithValue }) => {
+  try {
+    const response = await api.post('/payments/stripe/onboard');
+    return response.data.data; // Should contain the onboarding URL
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data?.message || 'Failed to initiate onboarding');
   }
 });
 
@@ -275,6 +295,9 @@ const dataSlice = createSlice({
       })
       .addCase(fetchEarnings.fulfilled, (state, action) => {
         state.earnings = action.payload;
+      })
+      .addCase(fetchWallet.fulfilled, (state, action) => {
+        state.wallet = action.payload;
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.profile = action.payload;

@@ -5,6 +5,7 @@ import DoctorsList from "./pages/public/Doctors.tsx";
 import DoctorDetails from "./pages/public/DoctorDetails.tsx";
 import BookDoctor from "./pages/patient/Booking.tsx";
 import BookingSuccess from "./pages/patient/BookingSuccess.tsx";
+import PaymentCancel from "./pages/patient/PaymentCancel.tsx";
 import Dashboard from "./pages/public/DashboardSwitcher.tsx";
 import AuthPage from "./pages/public/Auth.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
@@ -60,6 +61,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="book/:doctorId" element={<BookDoctor />} />
           <Route path="booking/success" element={<BookingSuccess />} />
+          <Route path="payment-cancel" element={<PaymentCancel />} />
           
           {/* Doctor Specific */}
           <Route path="patients" element={<DoctorPatients />} />
@@ -69,7 +71,9 @@ function App() {
           <Route path="profile" element={<DoctorProfile />} />
           
           {/* Admin Specific */}
-          <Route path="users" element={<AdminUsers />} />
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+            <Route path="users" element={<AdminUsers />} />
+          </Route>
         </Route>
       </Route>
 

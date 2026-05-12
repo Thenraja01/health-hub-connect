@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { fetchSchedules, createSchedule, fetchDoctorSlots } from '../../store/slices/dataSlice';
 import { toast } from "sonner";
+import api from '@/api/axios';
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -26,6 +27,16 @@ export default function DoctorSchedule() {
     dispatch(fetchSchedules());
     dispatch(fetchDoctorSlots());
   }, [dispatch]);
+
+  const handleUpdateSlotStatus = async (slotId: string, status: string) => {
+    try {
+      await api.patch(`/doctors/slots/${slotId}`, { status });
+      toast.success(`Slot marked as ${status}`);
+      dispatch(fetchDoctorSlots()); // Refresh slots
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to update slot");
+    }
+  };
 
   const handleAddSlot = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,9 +170,41 @@ export default function DoctorSchedule() {
                 </span>
               </div>
               <p className="text-lg font-bold tracking-tight">{new Date(slot.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              
+              <div className="mt-3 flex items-center justify-between gap-2">
+                {slot.slotStatus === 'AVAILABLE' ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full text-[10px] h-7 rounded-lg border-destructive/20 text-destructive hover:bg-destructive/10"
+                    onClick={() => handleUpdateSlotStatus(slot.id, 'BLOCKED')}
+                  >
+                    Block Slot
+                  </Button>
+                ) : slot.slotStatus === 'BLOCKED' ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full text-[10px] h-7 rounded-lg border-success/20 text-success hover:bg-success/10"
+                    onClick={() => handleUpdateSlotStatus(slot.id, 'AVAILABLE')}
+                  >
+                    Unblock Slot
+                  </Button>
+                ) : slot.slotStatus === 'BOOKED' ? (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full text-[10px] h-7 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => toast.info("Please use Appointments tab to manage booked appointments")}
+                  >
+                    Manage Booking
+                  </Button>
+                ) : null}
+              </div>
+
               {slot.appointment && (
                 <div className="mt-2 pt-2 border-t border-border/40">
-                  <p className="text-xs font-medium truncate">Patient ID: {slot.bookedPatientId?.slice(-6)}</p>
+                  <p className="text-[10px] font-medium truncate text-muted-foreground">Patient ID: {slot.bookedPatientId?.slice(-6).toUpperCase()}</p>
                 </div>
               )}
             </div>

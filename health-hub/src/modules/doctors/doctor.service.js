@@ -124,6 +124,37 @@ const createDoctorTask = async (doctorId, taskData) => {
   });
 };
 
+const updateSlotStatus = async (doctorId, slotId, status) => {
+  const slot = await prisma.appointmentSlot.findFirst({
+    where: { id: slotId, doctorId }
+  });
+
+  if (!slot) throw new Error('Slot not found or unauthorized');
+
+  return await prisma.appointmentSlot.update({
+    where: { id: slotId },
+    data: { slotStatus: status }
+  });
+};
+
+const addCertification = async (doctorId, certData) => {
+  const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
+  if (!doctor) throw new Error('Doctor not found');
+
+  let kycDocuments = doctor.kycDocuments || [];
+  if (!Array.isArray(kycDocuments)) kycDocuments = [];
+  
+  kycDocuments.push({
+    ...certData,
+    uploadedAt: new Date()
+  });
+
+  return await prisma.doctor.update({
+    where: { id: doctorId },
+    data: { kycDocuments }
+  });
+};
+
 module.exports = {
   getAllDoctors,
   getDoctorById,
@@ -137,4 +168,6 @@ module.exports = {
   createDoctorSchedule,
   getDoctorTasks,
   createDoctorTask,
+  updateSlotStatus,
+  addCertification,
 };
