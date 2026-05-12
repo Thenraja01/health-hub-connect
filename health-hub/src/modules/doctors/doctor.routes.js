@@ -3,15 +3,25 @@ const router = express.Router();
 const doctorController = require('./doctor.controller');
 const auth = require('../../middlewares/auth.middleware');
 const authorize = require('../../middlewares/role.middleware');
+const upload = require('../../middlewares/upload.middleware');
 
+// ─── Public Routes (no auth) ────────────────────────────────────
 router.get('/', doctorController.getDoctors);
 router.get('/specialties', doctorController.getSpecialties);
 
+// ─── Protected Routes (auth + DOCTOR role) ──────────────────────
 router.get(
   '/profile',
   auth,
   authorize('DOCTOR'),
   doctorController.getProfile
+);
+
+router.put(
+  '/profile',
+  auth,
+  authorize('DOCTOR'),
+  doctorController.updateProfile
 );
 
 router.get(
@@ -35,6 +45,13 @@ router.get(
   doctorController.getSchedule
 );
 
+router.post(
+  '/schedule',
+  auth,
+  authorize('DOCTOR'),
+  doctorController.createSchedule
+);
+
 router.get(
   '/slots',
   auth,
@@ -42,11 +59,11 @@ router.get(
   doctorController.getSlots
 );
 
-router.post(
-  '/schedule',
+router.patch(
+  '/slots/:slotId',
   auth,
   authorize('DOCTOR'),
-  doctorController.createSchedule
+  doctorController.updateSlotStatus
 );
 
 router.get(
@@ -62,9 +79,6 @@ router.post(
   authorize('DOCTOR'),
   doctorController.createTask
 );
-
-router.get('/:id', doctorController.getDoctor);
-router.get('/:id/slots', doctorController.getPublicSlots);
 
 router.put(
   '/status',
@@ -87,8 +101,6 @@ router.post(
   doctorController.withdrawBalance
 );
 
-const upload = require('../../middlewares/upload.middleware');
-
 router.post(
   '/upload-certification',
   auth,
@@ -97,18 +109,8 @@ router.post(
   doctorController.uploadCertification
 );
 
-router.put(
-  '/profile',
-  auth,
-  authorize('DOCTOR'),
-  doctorController.updateProfile
-);
-
-router.patch(
-  '/slots/:slotId',
-  auth,
-  authorize('DOCTOR'),
-  doctorController.updateSlotStatus
-);
+// ─── Parameterized Routes (MUST be last to avoid catching named routes) ─
+router.get('/:id', doctorController.getDoctor);
+router.get('/:id/slots', doctorController.getPublicSlots);
 
 module.exports = router;

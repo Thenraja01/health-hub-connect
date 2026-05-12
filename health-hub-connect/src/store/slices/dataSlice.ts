@@ -112,7 +112,7 @@ export const fetchDoctorPatients = createAsyncThunk('data/fetchDoctorPatients', 
 
 export const fetchTasks = createAsyncThunk('data/fetchTasks', async (_, { rejectWithValue }) => {
   try {
-    const response = await api.get('/doctor/tasks');
+    const response = await api.get('/doctors/tasks');
     return response.data.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Failed to fetch tasks');
@@ -121,7 +121,7 @@ export const fetchTasks = createAsyncThunk('data/fetchTasks', async (_, { reject
 
 export const fetchSchedules = createAsyncThunk('data/fetchSchedules', async (_, { rejectWithValue }) => {
   try {
-    const response = await api.get('/doctor/schedule');
+    const response = await api.get('/doctors/schedule');
     return response.data.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Failed to fetch schedules');
@@ -148,7 +148,7 @@ export const fetchPublicDoctorSlots = createAsyncThunk('data/fetchPublicDoctorSl
 
 export const fetchEarnings = createAsyncThunk('data/fetchEarnings', async (_, { rejectWithValue }) => {
   try {
-    const response = await api.get('/doctor/earnings');
+    const response = await api.get('/doctors/earnings');
     return response.data.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Failed to fetch earnings');
@@ -175,7 +175,7 @@ export const onboardStripe = createAsyncThunk('data/onboardStripe', async (_, { 
 
 export const createTask = createAsyncThunk('data/createTask', async (taskData: any, { rejectWithValue, dispatch }) => {
   try {
-    const response = await api.post('/doctor/tasks', taskData);
+    const response = await api.post('/doctors/tasks', taskData);
     dispatch(fetchTasks());
     return response.data.data;
   } catch (err: any) {
@@ -185,7 +185,7 @@ export const createTask = createAsyncThunk('data/createTask', async (taskData: a
 
 export const createSchedule = createAsyncThunk('data/createSchedule', async (scheduleData: any, { rejectWithValue, dispatch }) => {
   try {
-    const response = await api.post('/doctor/schedule', scheduleData);
+    const response = await api.post('/doctors/schedule', scheduleData);
     dispatch(fetchSchedules());
     return response.data.data;
   } catch (err: any) {

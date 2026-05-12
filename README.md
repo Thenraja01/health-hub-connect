@@ -191,10 +191,21 @@ doctop-app/
 │   │   ├── jobs/
 │   │   ├── middlewares/
 │   │   ├── modules/
-│   │   ├── routes/
+│   │   │   ├── admin/
+│   │   │   ├── analytics/
+│   │   │   ├── appointments/
+│   │   │   ├── auth/
+│   │   │   ├── consultations/
+│   │   │   ├── doctors/
+│   │   │   ├── hospitals/
+│   │   │   ├── notifications/
+│   │   │   ├── patients/
+│   │   │   ├── payments/
+│   │   │   ├── prescriptions/
+│   │   │   ├── reviews/
+│   │   │   └── wellness/
 │   │   ├── storage/
 │   │   ├── utils/
-│   │   ├── validators/
 │   │   ├── websocket/
 │   │   ├── app.js
 │   │   └── server.js
@@ -207,9 +218,21 @@ doctop-app/
 │   │   ├── api/
 │   │   ├── assets/
 │   │   ├── components/
+│   │   │   ├── dashboard/
+│   │   │   ├── doctor/
+│   │   │   ├── site/
+│   │   │   └── ui/
+│   │   ├── config/
+│   │   ├── context/
 │   │   ├── hooks/
+│   │   ├── lib/
 │   │   ├── pages/
+│   │   │   ├── admin/
+│   │   │   ├── doctor/
+│   │   │   ├── patient/
+│   │   │   └── public/
 │   │   ├── store/
+│   │   ├── types/
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   ├── vite.config.ts
@@ -264,7 +287,7 @@ npm run dev
 Backend server runs at:
 
 ```txt
-http://localhost:5002
+http://localhost:5000
 ```
 
 ---
@@ -298,7 +321,7 @@ http://localhost:5173
 
 ```env
 DATABASE_URL=
-PORT=5002
+PORT=5000
 NODE_ENV=development
 
 JWT_SECRET=
@@ -318,7 +341,7 @@ EMAIL_PASS=
 ## Frontend `.env`
 
 ```env
-VITE_API_URL=http://localhost:5002/api
+VITE_API_BASE_URL=http://localhost:5000/api
 ```
 
 ---
@@ -335,7 +358,6 @@ All API routes are prefixed with:
 | ---------------- | -------------------- |
 | Auth             | `/api/auth`          |
 | Doctors          | `/api/doctors`       |
-| Doctor Dashboard | `/api/doctor`        |
 | Patients         | `/api/patients`      |
 | Appointments     | `/api/appointments`  |
 | Payments         | `/api/payments`      |
@@ -350,7 +372,7 @@ All API routes are prefixed with:
 ### Swagger Documentation
 
 ```txt
-http://localhost:5002/api-docs
+http://localhost:5000/api-docs
 ```
 
 ---

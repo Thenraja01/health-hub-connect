@@ -4,6 +4,11 @@ const { generateToken, generateRefreshToken } = require('./jwt.service');
 const otpService = require('./otp.service');
 
 const login = async (email, password) => {
+  // Validate input
+  if (!email || !password) {
+    throw new Error('Email and password are required');
+  }
+
   // Check Patient table
   let user = await prisma.patient.findUnique({ where: { email } });
   let role = 'PATIENT';
@@ -24,9 +29,8 @@ const login = async (email, password) => {
     throw new Error('Invalid email or password');
   }
 
-  const isMatch = user.password.startsWith('$2') 
-    ? await comparePassword(password, user.password)
-    : password === user.password;
+  // Always use bcrypt comparison (encrypted passwords only)
+  const isMatch = await comparePassword(password, user.password);
 
   if (!isMatch) {
     throw new Error('Invalid email or password');
