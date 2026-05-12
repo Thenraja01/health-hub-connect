@@ -2,4 +2,22 @@ node_modules
 # Keep environment variables out of version control
 .env
 
+# Prisma generated
 /generated/prisma
+
+# Logs
+logs/
+*.log
+
+# Storage (user uploads, generated PDFs)
+storage/uploads/
+storage/temp/
+storage/prescriptions/
+
+# Binary downloads
+*.exe
+*.zip
+
+# IDE
+.vscode/
+.idea/

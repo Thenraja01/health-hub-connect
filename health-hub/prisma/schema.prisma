@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
 }
 
 enum UserStatus {
@@ -88,6 +87,10 @@ model Admin {
   deletedAt     DateTime?
 
   logs          AdminLog[]
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model AdminLog {
@@ -222,8 +225,14 @@ model Doctor {
   withdrawals           Withdrawal[]
   wallet                DoctorWallet?
 
+  @@index([email])
+  @@index([phone])
   @@index([hospitalId])
   @@index([specializationId])
+  @@index([status])
+  @@index([kycStatus])
+  @@index([isApproved])
+  @@index([createdAt])
 }
 
 model Withdrawal {

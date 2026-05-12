@@ -1,5 +1,5 @@
 const doctorService = require('./doctor.service');
-const walletService = require('../doctor/wallet.service');
+const walletService = require('./wallet.service');
 const { successResponse, errorResponse } = require('../../utils/response');
 
 const getDoctors = async (req, res) => {
