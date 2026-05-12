@@ -22,7 +22,7 @@ export default function Booking() {
 
   useEffect(() => {
     if (doctors.length === 0) {
-      dispatch(fetchDoctors());
+      dispatch(fetchDoctors({}));
     }
     if (doctorId) {
       dispatch(fetchPublicDoctorSlots(doctorId));

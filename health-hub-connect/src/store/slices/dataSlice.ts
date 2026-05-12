@@ -36,9 +36,9 @@ const initialState: DataState = {
   error: null,
 };
 
-export const fetchDoctors = createAsyncThunk('data/fetchDoctors', async (_, { rejectWithValue }) => {
+export const fetchDoctors = createAsyncThunk('data/fetchDoctors', async (params: any = {}, { rejectWithValue }) => {
   try {
-    const response = await api.get('/doctors');
+    const response = await api.get('/doctors', { params });
     return response.data.data; // Backend wraps in { success, data, message }
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Failed to fetch doctors');

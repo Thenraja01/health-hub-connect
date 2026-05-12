@@ -25,8 +25,11 @@ export default function Home() {
   const { doctors, specialties, loading } = useSelector((state: RootState) => state.data);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
+  const [search, setSearch] = React.useState("");
+  const [location, setLocation] = React.useState("");
+
   useEffect(() => {
-    dispatch(fetchDoctors());
+    dispatch(fetchDoctors({}));
     dispatch(fetchSpecialties());
   }, [dispatch]);
 
@@ -51,14 +54,24 @@ export default function Home() {
               <div className="flex flex-col gap-2 md:flex-row">
                 <div className="flex flex-1 items-center gap-2 rounded-xl bg-background/60 px-3">
                   <Search className="h-4 w-4 text-muted-foreground" />
-                  <Input className="h-11 border-0 bg-transparent shadow-none focus-visible:ring-0" placeholder="Doctor, specialty or symptom" />
+                  <Input 
+                    className="h-11 border-0 bg-transparent shadow-none focus-visible:ring-0" 
+                    placeholder="Doctor, specialty or symptom" 
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
                 </div>
                 <div className="flex flex-1 items-center gap-2 rounded-xl bg-background/60 px-3">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <Input className="h-11 border-0 bg-transparent shadow-none focus-visible:ring-0" placeholder="Bengaluru" />
+                  <Input 
+                    className="h-11 border-0 bg-transparent shadow-none focus-visible:ring-0" 
+                    placeholder="Location (City, State)" 
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
                 </div>
                 <Button asChild size="lg" className="h-11 rounded-xl bg-gradient-primary text-primary-foreground shadow-elegant hover:opacity-95">
-                  <Link to="/doctors">Search</Link>
+                  <Link to={`/doctors?search=${encodeURIComponent(search)}&location=${encodeURIComponent(location)}`}>Search</Link>
                 </Button>
               </div>
             </div>

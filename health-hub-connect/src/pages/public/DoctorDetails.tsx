@@ -17,7 +17,7 @@ export default function DoctorDetails() {
 
   useEffect(() => {
     if (doctors.length === 0) {
-      dispatch(fetchDoctors());
+      dispatch(fetchDoctors({}));
     }
   }, [dispatch, doctors.length]);
 
