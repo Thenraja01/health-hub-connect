@@ -1,0 +1,55 @@
+<svg width="300" height="224" viewBox="0 0 300 224" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_f_59_510)">
+<rect x="115" y="4" width="74" height="216" rx="12" fill="#ffffffff"/>
+<rect x="118" y="7" width="68" height="210" rx="9" stroke="black" stroke-width="6"/>
+</g>
+<g filter="url(#filter1_f_59_510)">
+<rect x="51" y="74" width="201" height="77" rx="12" fill="#ffffffff"/>
+<rect x="53.5" y="76.5" width="196" height="72" rx="9.5" stroke="black" stroke-width="5"/>
+</g>
+<g filter="url(#filter2_f_59_510)" style="mix-blend-mode:lighten">
+<path d="M183 133H121V47H183V133Z" fill="#ffffffff"/>
+</g>
+<g filter="url(#filter3_f_59_510)" style="mix-blend-mode:lighten">
+<path d="M183 185H121V95H183V185Z" fill="#ffffffff"/>
+</g>
+<line y1="115.5" x2="115" y2="115.5" stroke="#FF0505" stroke-width="5"/>
+<path d="M139.5 159L151.543 121L156.56 139L172.116 97L184.66 135.5L191.685 110H300" stroke="#FF0505" stroke-width="5"/>
+<path d="M112.5 116.671L133.99 93C135.643 115.496 139.059 160.185 139.5 158.976" stroke="#FF0505" stroke-width="5"/>
+<path d="M116 116L114.5 118L111 117.5L110.5 113.5H112.5L114.5 111.5L116 116Z" fill="#FF0505" stroke="#FF0505"/>
+<g filter="url(#filter4_i_59_510)">
+<path d="M143.367 73.8417C142.941 73.4159 142.436 73.0781 141.879 72.8476C141.323 72.6172 140.727 72.4985 140.125 72.4985C139.523 72.4985 138.927 72.6172 138.37 72.8476C137.814 73.0781 137.309 73.4159 136.883 73.8417L136 74.7251L135.117 73.8417C134.257 72.982 133.091 72.499 131.875 72.499C130.659 72.499 129.493 72.982 128.633 73.8417C127.774 74.7015 127.291 75.8675 127.291 77.0834C127.291 78.2993 127.774 79.4653 128.633 80.3251L136 87.6917L143.367 80.3251C143.792 79.8994 144.13 79.3941 144.361 78.8379C144.591 78.2816 144.71 77.6855 144.71 77.0834C144.71 76.4813 144.591 75.8851 144.361 75.3289C144.13 74.7727 143.792 74.2674 143.367 73.8417Z" stroke="#1D0585" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<filter id="filter0_f_59_510" x="111" y="0" width="82" height="224" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_59_510"/>
+</filter>
+<filter id="filter1_f_59_510" x="47" y="70" width="209" height="85" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_59_510"/>
+</filter>
+<filter id="filter2_f_59_510" x="117" y="43" width="70" height="94" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_59_510"/>
+</filter>
+<filter id="filter3_f_59_510" x="117" y="91" width="70" height="98" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_59_510"/>
+</filter>
+<filter id="filter4_i_59_510" x="126" y="70" width="20" height="24" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="4"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_59_510"/>
+</filter>
+</defs>
+</svg>

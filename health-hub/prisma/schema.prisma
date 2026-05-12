@@ -1,0 +1,636 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+  MISSED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
+  BLOCKED
+  COMPLETED
+  CANCELLED
+}
+
+enum ConsultationType {
+  VIDEO
+  AUDIO
+  CHAT
+  IN_PERSON
+  INSTANT
+  FOLLOWUP
+}
+
+enum PaymentType {
+  UPI
+  CREDIT_CARD
+  DEBIT_CARD
+  NET_BANKING
+  WALLET
+  CASH
+  INSURANCE
+}
+
+enum NotificationType {
+  APPOINTMENT
+  PAYMENT
+  PRESCRIPTION
+  FOLLOWUP
+  GENERAL
+}
+
+enum SeverityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Admin {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String      @unique
+  password      String
+  role          String
+  phone         String?
+  profileImage  Bytes?      // Saved in MongoDB
+  status        UserStatus  @default(ACTIVE)
+  refreshToken  String?     // For JWT refresh flow
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  logs          AdminLog[]
+}
+
+model AdminLog {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  adminId       String      @db.ObjectId
+
+  action        String
+  module        String
+  description   String?
+
+  ipAddress     String?
+  userAgent     String?
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  admin         Admin       @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+}
+
+model Hospital {
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+
+  hospitalName      String
+  hospitalType      String?
+
+  address           String?
+  city              String?
+  state             String?
+  country           String?
+  pincode           String?
+
+  latitude          Float?
+  longitude         Float?
+
+  contactNumber     String?
+  email             String?
+
+  openingTime       String?
+  closingTime       String?
+
+  status            UserStatus    @default(ACTIVE)
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+
+  doctors           Doctor[]
+
+  @@index([city])
+}
+
+model DoctorType {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+
+  typeName          String      @unique
+  description       String?
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  doctors           Doctor[]
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Doctor {
+  id                    String               @id @default(auto()) @map("_id") @db.ObjectId
+
+  doctorName            String
+  email                 String               @unique
+  phone                 String               @unique
+  password              String
+  refreshToken          String?              // For JWT refresh flow
+
+  qualification         String?
+  experienceYears       Int?
+
+  consultationFee       Float?
+  followupFee           Float?
+
+  bio                   String?
+
+  profileImage          Bytes?               // Saved in MongoDB
+  
+  // KYC & Approval
+  kycStatus             ApprovalStatus       @default(PENDING)
+  kycDocuments          Json?                // URLs or metadata of uploaded documents
+  isApproved            Boolean              @default(false)
+  commissionRate        Float                @default(10) // Percentage
+
+  averageRating         Float?               @default(0)
+  totalReviews          Int?                 @default(0)
+
+  licenseNumber         String?
+
+  consultationType      ConsultationType?
+
+  status                UserStatus           @default(ACTIVE)
+  isOnline              Boolean              @default(false)
+
+  specializationId      String?               @db.ObjectId
+  hospitalId            String?               @db.ObjectId
+
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  deletedAt             DateTime?
+
+  specialization        DoctorType?           @relation(fields: [specializationId], references: [id])
+  hospital              Hospital?             @relation(fields: [hospitalId], references: [id])
+
+  languages             DoctorLanguage[]
+
+  schedules             DoctorSchedule[]
+  leaves                DoctorLeave[]
+  slots                 AppointmentSlot[]
+
+  appointments          Appointment[]
+  prescriptions         Prescription[]
+  reviews               PatientReview[]
+  withdrawals           Withdrawal[]
+
+  @@index([hospitalId])
+  @@index([specializationId])
+}
+
+model Withdrawal {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  doctorId          String            @db.ObjectId
+  amount            Float
+  status            PaymentStatus     @default(PENDING)
+  bankDetails       Json?
+  processedAt       DateTime?
+  createdAt         DateTime          @default(now())
+
+  doctor            Doctor            @relation(fields: [doctorId], references: [id])
+}
+
+
+model DoctorLanguage {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+
+  doctorId        String      @db.ObjectId
+  language        String
+
+  createdAt       DateTime    @default(now())
+
+  doctor          Doctor      @relation(fields: [doctorId], references: [id])
+
+  @@index([doctorId])
+}
+
+model DoctorSchedule {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+
+  doctorId          String      @db.ObjectId
+
+  dayOfWeek         Int
+
+  startTime         String
+  endTime           String
+
+  slotDuration      Int
+
+  breakStartTime    String?
+  breakEndTime      String?
+
+  maxPatients       Int         @default(1)
+
+  isActive          Boolean     @default(true)
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  doctor            Doctor      @relation(fields: [doctorId], references: [id])
+
+  slots             AppointmentSlot[]
+
+  @@index([doctorId])
+}
+
+model DoctorLeave {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+
+  doctorId          String      @db.ObjectId
+
+  leaveDate         DateTime
+
+  reason            String?
+
+  isFullDay         Boolean     @default(true)
+
+  startTime         String?
+  endTime           String?
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  doctor            Doctor      @relation(fields: [doctorId], references: [id])
+
+  @@index([doctorId])
+}
+
+model Patient {
+  id                      String              @id @default(auto()) @map("_id") @db.ObjectId
+
+  patientCode             String              @unique
+
+  fullName                String
+
+  email                   String              @unique
+  phone                   String              @unique
+
+  alternatePhone          String?
+
+  password                String
+  refreshToken            String?             // For JWT refresh flow
+
+  gender                  String?
+
+  dob                     DateTime?
+  age                     Int?
+
+  bloodGroup              String?
+
+  weight                  Float?
+  height                  Float?
+
+  allergies               String?
+  chronicDiseases         String?
+
+  address                 String?
+  city                    String?
+  state                   String?
+  pincode                 String?
+
+  emergencyContactName    String?
+  emergencyContactPhone   String?
+
+  profileImage            Bytes?               // Saved in MongoDB
+
+  wellnessScore           Float?              @default(0)
+
+  status                  UserStatus          @default(ACTIVE)
+
+  registrationDate        DateTime            @default(now())
+
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  deletedAt               DateTime?
+
+  appointments            Appointment[]
+  prescriptions           Prescription[]
+  reviews                 PatientReview[]
+  notifications           Notification[]
+  sickDetails             PatientSickDetail[]
+  wellnessReports         WellnessScore[]
+
+}
+
+model AppointmentSlot {
+  id                    String               @id @default(auto()) @map("_id") @db.ObjectId
+
+  doctorId              String               @db.ObjectId
+  scheduleId            String               @db.ObjectId
+
+  startsAt              DateTime
+  endsAt                DateTime
+
+  slotStatus            SlotStatus           @default(AVAILABLE)
+
+  bookedPatientId       String?              @db.ObjectId
+
+  appointmentId         String?              @db.ObjectId
+
+  consultationType      ConsultationType
+
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  doctor                Doctor               @relation(fields: [doctorId], references: [id])
+
+  schedule              DoctorSchedule       @relation(fields: [scheduleId], references: [id])
+
+  appointment           Appointment?
+
+  @@unique([doctorId, startsAt, endsAt])
+
+  @@index([doctorId])
+  @@index([startsAt])
+}
+
+model Appointment {
+  id                        String                @id @default(auto()) @map("_id") @db.ObjectId
+
+  appointmentNumber         String                @unique
+
+  patientId                 String                @db.ObjectId
+  doctorId                  String                @db.ObjectId
+  slotId                    String                @unique @db.ObjectId
+
+  consultationType          ConsultationType
+
+  startsAt                  DateTime
+  endsAt                    DateTime
+
+  symptoms                  String?
+  diagnosis                 String?
+  notes                     String?
+
+  meetingLink               String?
+
+  bookingStatus             AppointmentStatus     @default(PENDING)
+
+  paymentStatus             PaymentStatus         @default(PENDING)
+
+  totalAmount               Float
+
+  followupParentId          String?               @db.ObjectId
+
+  createdAt                 DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
+
+  patient                   Patient               @relation(fields: [patientId], references: [id])
+
+  doctor                    Doctor                @relation(fields: [doctorId], references: [id])
+
+  slot                      AppointmentSlot       @relation(fields: [slotId], references: [id])
+
+  prescription              Prescription?
+  payment                   Payment?
+
+  sickDetails               PatientSickDetail[]
+  reviews                   PatientReview[]
+
+  followupParent            Appointment?          @relation("FollowUpAppointments", fields: [followupParentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  followups                 Appointment[]         @relation("FollowUpAppointments")
+
+  @@index([doctorId])
+  @@index([patientId])
+  @@index([startsAt])
+}
+
+model PatientSickDetail {
+  id                    String              @id @default(auto()) @map("_id") @db.ObjectId
+
+  patientId             String              @db.ObjectId
+  appointmentId         String              @db.ObjectId
+
+  sicknessName          String
+
+  symptoms              String?
+
+  sicknessDescription   String?
+
+  severityLevel         SeverityLevel
+
+  durationDays          Int?
+
+  attachments           Bytes?               // Saved in MongoDB
+
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  patient               Patient             @relation(fields: [patientId], references: [id])
+
+  appointment           Appointment         @relation(fields: [appointmentId], references: [id])
+
+  @@index([patientId])
+}
+
+model Prescription {
+  id                    String            @id @default(auto()) @map("_id") @db.ObjectId
+
+  appointmentId         String            @unique @db.ObjectId
+
+  patientId             String            @db.ObjectId
+  doctorId              String            @db.ObjectId
+
+  doctorNotes           String?
+
+  medicines             Json
+
+  recommendedTests      Json?
+
+  nextFollowupDate      DateTime?
+
+  digitalSignature      Bytes?               // Saved in MongoDB (Image or hash)
+  prescriptionPdf       Bytes?               // Saved in MongoDB
+
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  appointment           Appointment       @relation(fields: [appointmentId], references: [id])
+
+  patient               Patient           @relation(fields: [patientId], references: [id])
+
+  doctor                Doctor            @relation(fields: [doctorId], references: [id])
+
+  @@index([patientId])
+  @@index([doctorId])
+}
+
+
+model Payment {
+  id                    String            @id @default(auto()) @map("_id") @db.ObjectId
+
+  appointmentId         String            @unique @db.ObjectId
+
+  transactionId         String            @unique
+
+  paymentType           PaymentType
+
+  paymentGateway        String?
+
+  amount                Float
+
+  taxAmount             Float?            @default(0)
+
+  doctorAmount          Float?
+
+  commissionAmount      Float?
+
+  paymentStatus         PaymentStatus     @default(PENDING)
+
+  paidAt                DateTime?
+
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  appointment           Appointment       @relation(fields: [appointmentId], references: [id])
+
+  @@index([paymentStatus])
+}
+
+model PatientReview {
+  id                    String            @id @default(auto()) @map("_id") @db.ObjectId
+
+  patientId             String            @db.ObjectId
+  doctorId              String            @db.ObjectId
+  appointmentId         String            @db.ObjectId
+
+  rating                Float
+
+  reviewTitle           String?
+  reviewDescription     String?
+
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  patient               Patient           @relation(fields: [patientId], references: [id])
+
+  doctor                Doctor            @relation(fields: [doctorId], references: [id])
+
+  appointment           Appointment       @relation(fields: [appointmentId], references: [id])
+
+  @@index([doctorId])
+}
+
+model Notification {
+  id                    String              @id @default(auto()) @map("_id") @db.ObjectId
+
+  patientId             String              @db.ObjectId
+
+  title                 String
+  message               String
+
+  notificationType      NotificationType
+
+  isRead                Boolean             @default(false)
+
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  patient               Patient             @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+}
+
+model WellnessScore {
+  id                    String            @id @default(auto()) @map("_id") @db.ObjectId
+
+  patientId             String            @db.ObjectId
+
+  bmiScore              Float?
+  sleepScore            Float?
+  activityScore         Float?
+  heartRateScore        Float?
+  hydrationScore        Float?
+
+  overallScore          Float?
+
+  calculatedAt          DateTime          @default(now())
+
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  patient               Patient           @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+}
+
+model AuditLog {
+  id                    String            @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId                String?           @db.ObjectId
+
+  action                String
+
+  module                String
+  
+  ipAddress             String?
+
+  userAgent             String?
+
+  createdAt             DateTime          @default(now())
+
+  @@index([userId])
+}
+
+model Task {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  doctorId      String      @db.ObjectId
+  patientId     String?     @db.ObjectId
+  title         String
+  priority      String      // High, Medium, Low
+  status        String      // pending, completed
+  due           String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OTP {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  email         String      @unique
+  code          String
+  type          String      // SIGNUP, LOGIN, RESET_PASSWORD
+  expiresAt     DateTime
+  createdAt     DateTime    @default(now())
+}
