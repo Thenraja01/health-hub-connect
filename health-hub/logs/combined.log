@@ -1448,3 +1448,5 @@
 {"level":"info","message":"::1 - - [12/May/2026:12:07:11 +0000] \"GET /api/doctors/patients HTTP/1.1\" 304 - \"http://localhost:5000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","service":"health-hub-service","timestamp":"2026-05-12 17:37:11"}
 {"level":"info","message":"✅ Database connected successfully","service":"health-hub-service","timestamp":"2026-05-12 17:37:31"}
 {"level":"info","message":"🚀 Server running on port 5002","service":"health-hub-service","timestamp":"2026-05-12 17:37:31"}
+{"level":"info","message":"✅ Database connected successfully","service":"health-hub-service","timestamp":"2026-05-12 22:32:11"}
+{"level":"info","message":"🚀 Server running on port 5002","service":"health-hub-service","timestamp":"2026-05-12 22:32:11"}
