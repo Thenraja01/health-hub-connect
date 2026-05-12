@@ -46,14 +46,40 @@ class DoctorRepository extends BaseRepository {
   }
 
   async searchDoctors(filters = {}) {
-    const { specializationId, city, consultationType } = filters;
+    const { specializationId, city, consultationType, search, location } = filters;
+    
+    const where = {
+      status: 'ACTIVE',
+      AND: []
+    };
+
+    if (specializationId) where.AND.push({ specializationId });
+    if (consultationType) where.AND.push({ consultationType });
+
+    if (search) {
+      where.AND.push({
+        OR: [
+          { doctorName: { contains: search, mode: 'insensitive' } },
+          { specialization: { typeName: { contains: search, mode: 'insensitive' } } }
+        ]
+      });
+    }
+
+    if (location || city) {
+      const locTerm = location || city;
+      where.AND.push({
+        OR: [
+          { location: { contains: locTerm, mode: 'insensitive' } },
+          { hospital: { city: { contains: locTerm, mode: 'insensitive' } } },
+          { hospital: { state: { contains: locTerm, mode: 'insensitive' } } }
+        ]
+      });
+    }
+
+    if (where.AND.length === 0) delete where.AND;
+
     return await this.model.findMany({
-      where: {
-        status: 'ACTIVE',
-        specializationId,
-        consultationType,
-        hospital: city ? { city } : undefined,
-      },
+      where,
       include: {
         specialization: true,
         hospital: true,
