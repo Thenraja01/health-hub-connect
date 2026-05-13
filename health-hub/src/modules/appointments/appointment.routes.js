@@ -24,6 +24,12 @@ router.post(
   appointmentController.cancel
 );
 
+router.post(
+  '/reschedule',
+  authorize('PATIENT'),
+  appointmentController.reschedule
+);
+
 router.get(
   '/my-appointments',
   authorize('PATIENT'),

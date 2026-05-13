@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 enum UserStatus {
@@ -88,7 +89,6 @@ model Admin {
 
   logs          AdminLog[]
 
-  @@index([email])
   @@index([status])
   @@index([createdAt])
 }
@@ -225,8 +225,6 @@ model Doctor {
   withdrawals           Withdrawal[]
   wallet                DoctorWallet?
 
-  @@index([email])
-  @@index([phone])
   @@index([hospitalId])
   @@index([specializationId])
   @@index([status])
@@ -678,3 +676,12 @@ model OTP {
   expiresAt     DateTime
   createdAt     DateTime    @default(now())
 }
+
+model AppSettings {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  commissionRate    Float             @default(20)
+  appLogo           Bytes?
+  appName           String            @default("Health Hub")
+  brandingColor     String?
+  updatedAt         DateTime          @updatedAt
+}

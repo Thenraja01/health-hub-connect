@@ -162,6 +162,16 @@ export const UserDashboard: React.FC = () => {
                     <span className={`text-[9px] font-bold px-2 py-1 rounded-full uppercase ${item.bookingStatus === 'COMPLETED' ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'}`}>
                       {item.bookingStatus}
                     </span>
+                    {item.bookingStatus !== 'COMPLETED' && (
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-8 text-[10px] font-bold text-primary hover:bg-primary/10 rounded-lg px-3"
+                        asChild
+                      >
+                        <Link to={`/reschedule/${item.id}?doctorId=${item.doctorId}`}>RESCHEDULE</Link>
+                      </Button>
+                    )}
                     {item.bookingStatus === 'COMPLETED' && (
                       <Button 
                         size="icon" 

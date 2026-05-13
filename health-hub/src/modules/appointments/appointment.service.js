@@ -244,11 +244,83 @@ const getDoctorAppointments = async (doctorId) => {
   return await appointmentRepository.findByDoctor(doctorId);
 };
 
+const rescheduleAppointment = async (appointmentId, newSlotId = null) => {
+  return await prisma.$transaction(async (tx) => {
+    const appointment = await tx.appointment.findUnique({
+      where: { id: appointmentId },
+      include: { doctor: true, patient: true }
+    });
+
+    if (!appointment) throw new Error('Appointment not found');
+
+    let targetSlot;
+    if (newSlotId) {
+      targetSlot = await tx.appointmentSlot.findUnique({ where: { id: newSlotId } });
+    } else {
+      // Find the next available slot for this doctor
+      targetSlot = await tx.appointmentSlot.findFirst({
+        where: {
+          doctorId: appointment.doctorId,
+          slotStatus: 'AVAILABLE',
+          startsAt: { gt: appointment.startsAt }
+        },
+        orderBy: { startsAt: 'asc' }
+      });
+    }
+
+    if (!targetSlot || targetSlot.slotStatus !== 'AVAILABLE') {
+      throw new Error('No available slots found for rescheduling');
+    }
+
+    // 1. Release old slot
+    await tx.appointmentSlot.update({
+      where: { id: appointment.slotId },
+      data: {
+        slotStatus: 'AVAILABLE',
+        bookedPatientId: null,
+        appointmentId: null
+      }
+    });
+
+    // 2. Update Appointment
+    const updatedAppointment = await tx.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        slotId: targetSlot.id,
+        startsAt: targetSlot.startsAt,
+        endsAt: targetSlot.endsAt,
+        bookingStatus: 'RESCHEDULED'
+      }
+    });
+
+    // 3. Block new slot
+    await tx.appointmentSlot.update({
+      where: { id: targetSlot.id },
+      data: {
+        slotStatus: 'BOOKED',
+        bookedPatientId: appointment.patientId,
+        appointmentId: appointment.id
+      }
+    });
+
+    // 4. Notify Patient & Doctor
+    emailService.sendBookingSuccess(appointment.patient.email, {
+      doctorName: appointment.doctor.doctorName,
+      time: targetSlot.startsAt.toLocaleString(),
+      id: appointment.appointmentNumber,
+      isRescheduled: true
+    }).catch(err => console.error('Reschedule email error:', err));
+
+    return updatedAppointment;
+  });
+};
+
 module.exports = {
   bookAppointment,
   confirmAppointment,
   cancelAppointment,
   getPatientAppointments,
   getDoctorAppointments,
+  rescheduleAppointment,
 };
 

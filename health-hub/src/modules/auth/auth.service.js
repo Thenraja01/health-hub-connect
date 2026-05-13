@@ -68,7 +68,8 @@ const verifyLoginOTP = async (email, code, role) => {
     id: user.id,
     name: user.fullName || user.doctorName || user.name,
     email: user.email,
-    role: role
+    role: role,
+    isApproved: role === 'DOCTOR' ? user.isApproved : true
   };
 
   return { user: userData, token, refreshToken };
@@ -114,7 +115,15 @@ const completeSignup = async (email, code, userData) => {
     });
   } else if (role === 'DOCTOR') {
     newUser = await prisma.doctor.create({
-      data: { doctorName: fullName, email, phone, password, status: 'ACTIVE' },
+      data: { 
+        doctorName: fullName, 
+        email, 
+        phone, 
+        password, 
+        status: 'INACTIVE',
+        isApproved: false,
+        kycStatus: 'PENDING'
+      },
     });
   } else if (role === 'ADMIN') {
     newUser = await prisma.admin.create({

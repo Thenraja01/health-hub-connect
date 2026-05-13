@@ -6,6 +6,7 @@ import DoctorDetails from "./pages/public/DoctorDetails.tsx";
 import BookDoctor from "./pages/patient/Booking.tsx";
 import BookingSuccess from "./pages/patient/BookingSuccess.tsx";
 import PaymentCancel from "./pages/patient/PaymentCancel.tsx";
+import Reschedule from "./pages/patient/Reschedule.tsx";
 import Dashboard from "./pages/public/DashboardSwitcher.tsx";
 import AuthPage from "./pages/public/Auth.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
@@ -19,6 +20,7 @@ import DoctorSchedule from "./pages/doctor/Schedule.tsx";
 import DoctorEarnings from "./pages/doctor/Earnings.tsx";
 import DoctorProfile from "./pages/doctor/Profile.tsx";
 import AdminUsers from "./pages/admin/Users.tsx";
+import AdminSettings from "./pages/admin/Settings.tsx";
 
 import { Toaster } from "./components/ui/sonner";
 
@@ -62,6 +64,7 @@ function App() {
           <Route path="book/:doctorId" element={<BookDoctor />} />
           <Route path="booking/success" element={<BookingSuccess />} />
           <Route path="payment-cancel" element={<PaymentCancel />} />
+          <Route path="reschedule/:appointmentId" element={<Reschedule />} />
           
           {/* Doctor Specific */}
           <Route path="patients" element={<DoctorPatients />} />
@@ -73,6 +76,7 @@ function App() {
           {/* Admin Specific */}
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="users" element={<AdminUsers />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Route>
       </Route>

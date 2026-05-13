@@ -2,19 +2,33 @@ import { Link, NavLink } from "react-router-dom";
 import { 
   Activity, CalendarCheck, LayoutDashboard, Menu, Search, 
   Stethoscope, LogOut, User, ListChecks, Users, ShieldCheck, 
-  Building2, Home,
+  Building2, Home, Settings,
   TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";  
 import { logout } from "../../store/slices/authSlice";
+import api from "@/api/axios";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
+  const [appSettings, setAppSettings] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await api.get("/admin/settings/public");
+        setAppSettings(res.data.data);
+      } catch (error) {
+        console.error("Failed to fetch app settings", error);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const navLinks = useMemo(() => {
     if (!isAuthenticated) return [
@@ -34,6 +48,7 @@ export function Navbar() {
           { to: "/dashboard", label: "Admin Panel", icon: ShieldCheck },
           { to: "/users", label: "Manage Users", icon: Users },
           { to: "/hospitals", label: "Institutions", icon: Building2 },
+          { to: "/settings", label: "App Settings", icon: Settings },
         ];
       case 'PATIENT':
       default:
@@ -51,10 +66,20 @@ export function Navbar() {
       <div className="glass-strong border-b border-border/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2">
-            <div className="h-9 w-9 bg-primary rounded-xl flex items-center justify-center shadow-glow">
-              <Activity className="text-white h-5 w-5" />
+            <div className="h-9 w-9 bg-primary rounded-xl flex items-center justify-center shadow-glow overflow-hidden">
+               <img 
+                 src={`${import.meta.env.VITE_API_URL}/admin/settings/logo`} 
+                 alt="Logo" 
+                 className="h-full w-full object-cover"
+                 onError={(e) => {
+                   (e.target as HTMLImageElement).style.display = 'none';
+                   (e.target as HTMLImageElement).parentElement!.innerHTML = '<svg class="text-white h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>';
+                 }}
+               />
             </div>
-            <span className="font-display text-xl font-bold tracking-tight hidden sm:block">Health Hub</span>
+            <span className="font-display text-xl font-bold tracking-tight hidden sm:block">
+              {appSettings?.appName || 'Medi Slot'}
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">

@@ -48,10 +48,21 @@ const cancel = async (req, res) => {
   }
 };
 
+const reschedule = async (req, res) => {
+  try {
+    const { appointmentId, newSlotId } = req.body;
+    const appointment = await appointmentService.rescheduleAppointment(appointmentId, newSlotId);
+    successResponse(res, appointment, 'Appointment rescheduled successfully');
+  } catch (error) {
+    errorResponse(res, error.message, 400, error);
+  }
+};
+
 module.exports = {
   book,
   confirm,
   cancel,
+  reschedule,
   getMyAppointments,
   getDoctorAppointments,
 };
